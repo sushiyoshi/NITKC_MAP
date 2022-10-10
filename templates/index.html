@@ -1,0 +1,45 @@
+<!--<!DOCTYPE html>-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>NITKC MAP</title>
+</head>
+<body>
+    <div id="wrapper">
+        <canvas id="c" width="2000" height="1500"></canvas>
+    </div>
+</body>
+<style>
+    body{
+        margin:0px;
+        padding:0px;
+        position:relative;
+    }
+    body #wrapper{
+        width:100%;
+        height:100%;
+        position:fixed;
+    }
+    #map{
+        display:none;
+    }
+</style>
+<script type="text/javascript">
+    (function() {
+        sizing()
+        $(window).resize(() => {
+            sizing()
+        })
+    })
+    const sizing = () => {
+        $("c").attr({height:$("#wrapper").height()})
+        $("c").attr({width:$("#wrapper").width()})
+    }
+</script>
+<script type="text/javascript">
+    var list_data = {{ path | tojson }};
+</script>
+<!-- <script type="text/javascript" src="main.js"></script> -->
+<img id="map" src="{{ url_for('static', filename='image/Untitled.svg') }}"> 
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</html>
