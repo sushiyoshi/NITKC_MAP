@@ -7,6 +7,13 @@ from flask import request
 import sys
 from mymysql import CoordinatesList,LocationList
 app = Flask(__name__)
+
+def AreaTextConvert(area):
+    if area[1] is None:
+        return area[0]
+    else:
+        return area[0] + str(area[1]) + "階"
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -22,7 +29,12 @@ def mappage():
     if not(currentArea and targetArea):
         return render_template("error.html",error_text="location not found")
     #現在地と目的地を入力
-    result = get_node_path(currentArea,targetArea)
+    currentAreaText = currentArea[0][0]
+    targetAreaText = targetArea[0][0]
+    result = get_node_path(currentAreaText,targetAreaText)
+    currentAreaFloor = AreaTextConvert(currentArea[0])
+    targetAreaFloor = AreaTextConvert(targetArea[0])
+    resultStr = currentAreaFloor + "<br>" + "↓<br>" + targetAreaFloor
     #距離を取得
     weight = result[0]['weight']
     #経由するノードを取得
@@ -31,7 +43,6 @@ def mappage():
     pathList = []
     relationships = list(result[1])
     coordinatesList = CoordinatesList(sys.argv[2])
-    AreaList = [elem.get("name") for elem in result[2] if "Area" in elem.labels]
     # 以下クソコ
     for current in relationships:
         #current = relationships[i]
@@ -53,7 +64,7 @@ def mappage():
             coordinatesList.createCoordinatesList(table_name,re)
         pathList.extend(re)
     coordinatesList.close()
-    return render_template("mappage.html",path=pathList)
+    return render_template("mappage.html",path=pathList,currentAreaFloor=currentAreaFloor,targetAreaFloor=targetAreaFloor)
 
 def get_node_path(Area1,Area2):
     uri = "neo4j+s://cfa2fb67.databases.neo4j.io:7687"

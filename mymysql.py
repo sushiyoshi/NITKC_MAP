@@ -18,13 +18,13 @@ class LocationList:
             print(f"Error Occurred: {e}")
     def getArea(self,location):
         sql="""
-        select area from locationList where location = "{nm}";
+        select area,floor from locationList where location = "{nm}";
         """.format(nm=location)
         try:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()
-            if len(rows)>0 and len(rows[0])>0:
-                return rows[0][0]
+            if len(rows)>0:
+                return rows
             else:
                 print(sql)
                 return False

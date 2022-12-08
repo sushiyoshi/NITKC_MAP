@@ -127,10 +127,6 @@ def get_plot(start_point, goal_point):
     img1gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     ret,mask=cv2.threshold(img1gray,250,255,cv2.THRESH_BINARY)
     cv2.imwrite("output-3.png", mask)
-    #start_point = Point(200, 595)
-    #goal_point = Point(337,358)
-    # start_point = Point(90,200)
-    # goal_point = Point(300,300)
     path = get_path(mask, start_point, goal_point)
     return path[::5]
 
