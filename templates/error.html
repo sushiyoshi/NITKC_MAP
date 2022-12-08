@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <style type=text/css>
+      body {
+        background: #444;
+        font-family: "sans-serif";
+        font-weight:600;
+        color: #fff;
+        text-align: center;
+        margin:0 auto;
+      }
+      .text{
+        font-size: 1.5em;
+        animation: anime 2.0s ease;
+        top: 50%;
+      }
+      @keyframes anime {
+        0% {
+            opacity:  0.0;
+            transform: translateY(-10%);
+        }
+        100% {
+            opacity:  1.0;
+            top: translateY(100%)
+        }
+      }
+    </style>
+    <meta charset=utf-8 />
+    <title>Error</title>
+  </head>
+  <body>
+    <div class="text">
+      <a>{{error_text}}</a>
+    </div>
+  </body>
+</html>

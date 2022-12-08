@@ -3,13 +3,26 @@ from tracemalloc import start
 from flask import Flask, render_template
 from mygraph import GraphApp
 from map_linetrace import get_plot,Point
+from flask import request
 import sys
-from coordinatesList import CoordinatesList
+from mymysql import CoordinatesList,LocationList
 app = Flask(__name__)
 @app.route("/")
 def index():
+    return render_template("index.html")
+@app.route("/mappage", methods=['GET'])
+def mappage():
+    #入力
+    current = request.args.get('loc1', '')
+    target = request.args.get('loc2', '')
+    location_list = LocationList(sys.argv[2])
+    #SQLインジェクションできるところ
+    currentArea = location_list.getArea(current)
+    targetArea = location_list.getArea(target)
+    if not(currentArea and targetArea):
+        return render_template("error.html",error_text="location not found")
     #現在地と目的地を入力
-    result = get_node_path("正門","第一駐車場")
+    result = get_node_path(currentArea,targetArea)
     #距離を取得
     weight = result[0]['weight']
     #経由するノードを取得
@@ -18,7 +31,7 @@ def index():
     pathList = []
     relationships = list(result[1])
     coordinatesList = CoordinatesList(sys.argv[2])
-
+    AreaList = [elem.get("name") for elem in result[2] if "Area" in elem.labels]
     # 以下クソコ
     for current in relationships:
         #current = relationships[i]
@@ -40,7 +53,7 @@ def index():
             coordinatesList.createCoordinatesList(table_name,re)
         pathList.extend(re)
     coordinatesList.close()
-    return render_template("index.html",path=pathList)
+    return render_template("mappage.html",path=pathList)
 
 def get_node_path(Area1,Area2):
     uri = "neo4j+s://cfa2fb67.databases.neo4j.io:7687"

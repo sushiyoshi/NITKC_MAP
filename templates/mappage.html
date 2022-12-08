@@ -1,0 +1,100 @@
+<!--<!DOCTYPE html>-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>NITKC MAP</title>
+</head>
+<body>  
+    <div id="wrapper">
+        <div id="box1">
+            <fieldset>
+                <form id="location-form" action="/mappage">
+                    <label for="search-box">現在地：</label>
+                    <input type="text" class="search-box" name="loc1"/>
+                    <label for="search-box">目的地：</label>
+                    <input type="text" class="search-box" name="loc2"/>
+                    <input type="submit" value="検索" />
+                </form>
+                </fieldset>
+        </div>
+        <div id="box2">
+            <canvas id="c" width="2000" height="1500"></canvas>
+        </div>
+        <div id="box3">
+        </div>
+    </div>
+</body>
+<style>
+    body{
+        margin:0px;
+        padding:0px;
+        position:relative;
+        background-color: #eee;
+    }
+    body #wrapper{
+        width:100%;
+        height:100%;
+        position:fixed;
+        display: grid;
+        grid-template-columns: 10% 10%;
+        grid-template-rows: 10% 10%;
+        grid-gap: 0%;
+    }
+    #box1 {
+        grid-column: 1 / 10;
+        grid-row: 1;
+    }
+    #box2 {
+        grid-column: 1 / 10;
+        grid-row: 2/10;
+    }
+    #map{
+        display:none;
+    }
+    .search-box {
+        width: 10%;
+        background-color: #444;
+        border-radius: 2px;
+        color:white
+    }
+    .search-box:focus {
+        border-color: #07f;
+    }
+    input[type="submit"] {
+        background-color: #555;
+        color: white;
+        border-radius: 5px;
+    }
+    input[type="submit"]:hover {
+        background-color: #07f;
+    }
+    label{
+        color:white;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    fieldset {
+        background-color: #222;
+        border: 1px solid #222;
+        width: 100%;
+        
+    }
+</style>
+<script type="text/javascript">
+    (function() {
+        sizing()
+        $(window).resize(() => {
+            sizing()
+        })
+    })
+    const sizing = () => {
+        $("c").attr({height:$("#wrapper").height()})
+        $("c").attr({width:$("#wrapper").width()})
+    }
+</script>
+<script type="text/javascript">
+    var list_data = {{ path | tojson }};
+</script>
+<!-- <script type="text/javascript" src="main.js"></script> -->
+<img id="map" src="{{ url_for('static', filename='image/Untitled.svg') }}"> 
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</html>

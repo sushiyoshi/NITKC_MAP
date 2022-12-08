@@ -3,9 +3,39 @@ import mysql.connector
 import sys
 from map_linetrace import get_plot,Point
 cnx = None
+class LocationList:
+    __slots__=("cnx","cursor")
+    def __init__(self,pswd:str):
+        try:
+            self.cnx = mysql.connector.connect(
+                user='root',  # ユーザー名
+                password=pswd,  # パスワード
+                host='localhost',  # ホスト名(IPアドレス）
+                db='locationList'
+            )
+            self.cursor=self.cnx.cursor()
+        except Exception as e:
+            print(f"Error Occurred: {e}")
+    def getArea(self,location):
+        sql="""
+        select area from locationList where location = "{nm}";
+        """.format(nm=location)
+        try:
+            self.cursor.execute(sql)
+            rows = self.cursor.fetchall()
+            if len(rows)>0 and len(rows[0])>0:
+                return rows[0][0]
+            else:
+                print(sql)
+                return False
+        except Exception as e:
+            print(e)
+            return False
+    def close(self):
+        self.cnx.close()
 
 class CoordinatesList:
-    __slots__=("cnx","cursor","coordinatesList")
+    __slots__=("cnx","cursor")
     def __init__(self,pswd:str):
         try:
             self.cnx = mysql.connector.connect(
@@ -50,14 +80,12 @@ class CoordinatesList:
                 y float
             );
             """.format(tbname=table_name)
-        print(sql)
         try:
             self.cursor.execute(sql)
             for elem in coordinatesList:
                 sql="""
                 insert INTO {tbname}(x,y) values({x},{y});
                 """.format(tbname=table_name,x=elem.x,y=elem.y)
-                print("adasdadss")
                 try:
                     self.cursor.execute(sql)
                     print("insert")
@@ -65,7 +93,6 @@ class CoordinatesList:
                     Exception(e)
             self.cnx.commit()
         except Exception as e:
-            print("dameka~~")
             Exception(e)
 
     def close(self):
@@ -79,3 +106,13 @@ class CoordinatesList:
 #     print(plotList)
 #     #coordinatesList.createCoordinatesList("test222",plotList)
 #     coordinatesList.close()
+
+if __name__ == "__main__":
+    location_list = LocationList(sys.argv[1])
+    location_name = input("Enter the location name: ")
+    result = location_list.getArea(location_name)
+    if result:
+        print(f"The area of the location is: {result}")
+    else:
+        print(f"Could not find the location: {location_name}")
+    location_list.close()

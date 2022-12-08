@@ -1,5 +1,7 @@
 //console.log(list_data)
-
+let form = document.getElementById('location-form');
+let input = form.elements;
+console.log(input[0].value,input[1].value)
 const canvas = document.getElementById('c')
 let ctx = canvas.getContext('2d')
 //let img = new Image()
@@ -9,7 +11,6 @@ let img  = document.getElementById('map')
 window.addEventListener("DOMContentLoaded",() => {
     console.log("画像読み込み成功")
     animloop()   
-    //console.log(list_data)
 })
 const getMousePosition = (canvas,evt) => {
     let rect = canvas.getBoundingClientRect()
@@ -68,13 +69,14 @@ canvas.addEventListener('mousewheel', evt => {
     cameraPos.y += mouse.y*SCALE_STEP / (imageScale * (imageScale - SCALE_STEP))*incdec
 }, false);
 
+const gridWidthMag = 0.8
 const ini = () => {
     ctx.beginPath();
 	ctx.globalAlpha = 1;
     ctx.fillStyle = '#fff';
 	ctx.fillRect(0,0,canvas.width,canvas.height);
     cameraPosMax = {
-        x:imageScale*3000-window.innerWidth,
+        x:imageScale*3000-window.innerWidth*gridWidthMag,
         y:imageScale*3000-window.innerHeight
     }
 }
