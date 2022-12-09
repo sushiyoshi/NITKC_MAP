@@ -3,6 +3,7 @@ import mysql.connector
 import sys
 from map_linetrace import get_plot,Point
 cnx = None
+#Location-Areaテーブル
 class LocationList:
     __slots__=("cnx","cursor")
     def __init__(self,pswd:str):
@@ -16,6 +17,7 @@ class LocationList:
             self.cursor=self.cnx.cursor()
         except Exception as e:
             print(f"Error Occurred: {e}")
+    #LocationをAreaに変換
     def getArea(self,location):
         sql="""
         select area,floor from locationList where location = "{nm}";
@@ -33,7 +35,7 @@ class LocationList:
             return False
     def close(self):
         self.cnx.close()
-
+#座標リスト用データベース
 class CoordinatesList:
     __slots__=("cnx","cursor")
     def __init__(self,pswd:str):
@@ -47,7 +49,7 @@ class CoordinatesList:
             self.cursor=self.cnx.cursor()
         except Exception as e:
             print(f"Error Occurred: {e}")
-
+    #座標リストが存在するかを判定
     def isExistCoordinatesList(self,name:str)->Boolean:
         sql="""
         show tables like '{nm}';
@@ -59,6 +61,7 @@ class CoordinatesList:
         except Exception as e:
             print(e)
             return False
+    #座標リストを取得
     def getCoordinatesList(self,name:str):
         sql="""
         select x,y from {nm};
@@ -72,6 +75,7 @@ class CoordinatesList:
         except Exception as e:
             Exception(e)
             return []
+    #座標リスト生成
     def createCoordinatesList(self,table_name:str,coordinatesList):
         sql="""
             CREATE table {tbname}(
@@ -88,7 +92,6 @@ class CoordinatesList:
                 """.format(tbname=table_name,x=elem.x,y=elem.y)
                 try:
                     self.cursor.execute(sql)
-                    print("insert")
                 except Exception as e:
                     Exception(e)
             self.cnx.commit()

@@ -15,6 +15,7 @@ class GraphApp:
         return result
     @staticmethod
     def _find_shortestPath(tx,start,goal):
+        #ダイクストラ法で最短経路を求めるクエリ
         query= (
             "MATCH (p1:Area{name:$start}), (p2:Area{name:$goal}) "
             "call apoc.algo.dijkstra(p1, p2, 'ROUTED', 'distance') YIELD path,weight "

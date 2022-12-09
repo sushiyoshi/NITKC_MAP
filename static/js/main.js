@@ -1,12 +1,10 @@
-//console.log(list_data)
+
 let form = document.getElementById('location-form');
 let input = form.elements;
 console.log(input[0].value,input[1].value)
 const canvas = document.getElementById('c')
 let ctx = canvas.getContext('2d')
-//let img = new Image()
-//img.src = 'image/map.svg'
-//img.src = 'image/Untitled.svg'
+
 let img  = document.getElementById('map')
 window.addEventListener("DOMContentLoaded",() => {
     console.log("画像読み込み成功")
@@ -58,6 +56,7 @@ canvas.addEventListener('mouseleave', () => {
 canvas.addEventListener('mousemove', evt => {
     mousePos = getMousePosition(canvas, evt);
 }, false);
+//マウスホイール操作のの拡大・縮小率
 let SCALE_STEP = 0.025
 canvas.addEventListener('mousewheel', evt => {
     let incdec = 1 - (evt.deltaY < 0) * 2
@@ -69,7 +68,9 @@ canvas.addEventListener('mousewheel', evt => {
     cameraPos.y += mouse.y*SCALE_STEP / (imageScale * (imageScale - SCALE_STEP))*incdec
 }, false);
 
+//グリッドの画面比率
 const gridWidthMag = 0.8
+//main文の最初
 const ini = () => {
     ctx.beginPath();
 	ctx.globalAlpha = 1;
@@ -80,6 +81,7 @@ const ini = () => {
         y:imageScale*3000-window.innerHeight
     }
 }
+//マウスドラッグ中の動作
 const mouse_drag = () => {
     cameraPos.x = prev_MousePos.x+click_cameraPos.x-mousePos.x
     cameraPos.y = prev_MousePos.y+click_cameraPos.y-mousePos.y
@@ -87,13 +89,14 @@ const mouse_drag = () => {
     d_cameraPos.y = cameraPos.y-prev_cameraPos.y
     prev_cameraPos = copyPosition(cameraPos)
 }
+//マウスドラッグ後の余韻
 const mouse_drag_after = () => {
     d_cameraPos.x = Math.abs(d_cameraPos.x)>eps ? d_cameraPos.x*0.9 : 0
     d_cameraPos.y = Math.abs(d_cameraPos.y)>eps ? d_cameraPos.y*0.9 : 0
     cameraPos.x+= d_cameraPos.x
     cameraPos.y+= d_cameraPos.y
 }
-
+//画像上の座標変換用の原点座標
 const base = {
     // x:-119,
     // y:-21,
@@ -102,13 +105,16 @@ const base = {
     scale:5.9
     /* 根拠なし　適当に調整したらこうなった */
 }
+//openCVの画像上の座標に変換
 const convert_cv_pos = pos => {
     return {
         x: (pos.x+cameraPos.x)/imageScale/base.scale-base.x,
         y: (pos.y+cameraPos.y)/imageScale/base.scale-base.y
     }
 }
+//バックエンドから受け取った座標リストをプロットする
 const drawPlotAll = () => {
+    //座標リストの座標を画面上の座標に変換
     let convert = list_data.map((pos) => {
         return {x:(pos[1]+base.x)*imageScale*base.scale-cameraPos.x,y:(pos[0]+base.y)*imageScale*base.scale-cameraPos.y}
     })
@@ -125,7 +131,7 @@ const drawPlotAll = () => {
     })
     //ctx.stroke();
 }
-
+//main文
 const all = () => {
     ini()
     if(move_flag) {
@@ -137,6 +143,7 @@ const all = () => {
     ctx.drawImage(img, cameraPos.x*-1, cameraPos.y*-1, imageScale*3000, imageScale*3000);
     drawPlotAll()
 }
+//無限ループ用関数
 const animloop = () =>{
 	all();
 	window.requestAnimationFrame(animloop);

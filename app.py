@@ -19,22 +19,24 @@ def index():
     return render_template("index.html")
 @app.route("/mappage", methods=['GET'])
 def mappage():
-    #入力
+    #ユーザー入力を受け取る
     current = request.args.get('loc1', '')
     target = request.args.get('loc2', '')
+    #Location-Areaテーブルにアクセス
     location_list = LocationList(sys.argv[2])
-    #SQLインジェクションできるところ
+    #LocationをAreaに変換
     currentArea = location_list.getArea(current)
     targetArea = location_list.getArea(target)
+    #無効なLocationを取得した際、エラーページを表示
     if not(currentArea and targetArea):
         return render_template("error.html",error_text="location not found")
-    #現在地と目的地を入力
+    #
     currentAreaText = currentArea[0][0]
     targetAreaText = targetArea[0][0]
-    result = get_node_path(currentAreaText,targetAreaText)
     currentAreaFloor = AreaTextConvert(currentArea[0])
     targetAreaFloor = AreaTextConvert(targetArea[0])
-    resultStr = currentAreaFloor + "<br>" + "↓<br>" + targetAreaFloor
+    #現在地から目的地への最短経路を取得
+    result = get_node_path(currentAreaText,targetAreaText)
     #距離を取得
     weight = result[0]['weight']
     #経由するノードを取得
@@ -42,6 +44,7 @@ def mappage():
     #経路を形成する点の座標リストを格納
     pathList = []
     relationships = list(result[1])
+    #座標リストデータベースにアクセス
     coordinatesList = CoordinatesList(sys.argv[2])
     # 以下クソコ
     for current in relationships:
@@ -57,6 +60,7 @@ def mappage():
             print("Create a new coordinates list")
             pointList =[]
             for node in current.nodes:
+                #ノードが複数の座標を持っていた場合、どの座標を採用するかを設定するインデックス(通常は存在しない)
                 index = "index_{}".format(node.id)
                 j = current._properties[index] if index in current._properties else 0
                 pointList.append(Point(node._properties['y'][j],node._properties['x'][j]))
