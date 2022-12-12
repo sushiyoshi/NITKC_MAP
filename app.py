@@ -34,10 +34,10 @@ def mappage():
     #無効なLocationを取得した際、エラーページを表示
     if not(currentArea and targetArea):
         return render_template("error.html",error_text="location not found")
-    
+    #なぜか配列の中にタプルが入っている形式で返されるので、[0][0]でアクセスしている。(やばい)
     currentAreaText = currentArea[0][0]
     targetAreaText = targetArea[0][0]
-
+    #地図左の枠に表示する用のテキストを作る
     currentAreaFloor = AreaTextConvert(currentArea[0])
     targetAreaFloor = AreaTextConvert(targetArea[0])
     #現在地から目的地への最短経路を取得
@@ -48,14 +48,14 @@ def mappage():
     path = result[0]['path'][::2]
     #経路を形成する点の座標リストを格納
     pathList = []
-    relationships = list(result[1])
+    relationships = result[1]
     #座標リストデータベースにアクセス
     coordinatesList = CoordinatesList(sys.argv[2])
     # 以下クソコ
     for current in relationships:
         re = []
         table_name=current._properties['name']
-        #座標リストデータベース上に該当する座標リストが存在したら
+        #座標リストデータベース上に該当する座標リストが存在したら(→mymysql.py)
         if coordinatesList.isExistCoordinatesList(table_name):
             print("Get a coordinates list")
             re = coordinatesList.getCoordinatesList(table_name)
@@ -64,12 +64,20 @@ def mappage():
             print("Create a new coordinates list")
             pointList =[]
             for node in current.nodes:
+                #ここが一番やばい部分なので、解読しなくて良いです。
+
+                #グラフデータベースが返したリレーションシップのリストを読み込んで、
+                #リレーションシップに接続されているノードが持っている座標を取得しています。
+
                 #ノードが複数の座標を持っていた場合、どの座標を採用するかを設定するインデックス(通常は存在しない)
                 index = "index_{}".format(node.id)
                 j = current._properties[index] if index in current._properties else 0
                 pointList.append(Point(node._properties['y'][j],node._properties['x'][j]))
+            #グラフデータベースから読み込んだ二つの座標を結ぶ経路の座標リストをOpenCVで生成(→map_linetrace.py)
             re = get_plot(pointList[0],pointList[1])
+            #生成した座標リストをMySQLに登録(→mymysql.py)
             coordinatesList.createCoordinatesList(table_name,re)
+        #座標リストにリレーションシップを形成する点の座標を登録
         pathList.extend(re)
     coordinatesList.close()
     return render_template("mappage.html",path=pathList,currentAreaFloor=currentAreaFloor,targetAreaFloor=targetAreaFloor)

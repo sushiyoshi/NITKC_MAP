@@ -24,4 +24,5 @@ class GraphApp:
         result = tx.run(query,start=start,goal=goal)
         data = result.data()
         graph =result.graph()
-        return [data[0],graph.relationships,list(graph.nodes)]
+        #(経路、重見の合計),(経由するリレーションシップ)、(経由するグラフ)
+        return [data[0],list(graph.relationships),list(graph.nodes)]

@@ -1,3 +1,7 @@
+#参考：
+# https://qiita.com/ikngtty/items/ffef099b1d81f3bff5c2、
+# https://github.com/ikngtty/solve_maze
+
 import cv2
 import numpy as np
 import collections
@@ -11,7 +15,6 @@ Point._delta_udlr = (
     Point(0, -1),
     Point(0, 1)
 )
-
 def _Point____add__(self, other):
     return Point(self.y + other.y,self.x + other.x)
 
@@ -130,6 +133,8 @@ def get_plot(start_point, goal_point):
     path = get_path(mask, start_point, goal_point)
     return path[::5]
 
+
+#テスト用コード。読まなくて良い
 if __name__ == "__main__":
     img1 = cv2.imread("map2.png")
     img1gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)

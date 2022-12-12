@@ -1,13 +1,9 @@
-
-let form = document.getElementById('location-form');
-let input = form.elements;
-console.log(input[0].value,input[1].value)
 const canvas = document.getElementById('c')
 let ctx = canvas.getContext('2d')
 
+//地図画像
 let img  = document.getElementById('map')
-window.addEventListener("DOMContentLoaded",() => {
-    console.log("画像読み込み成功")
+window.addEventListener("DOMContentLoaded",() => {    
     animloop()   
 })
 const getMousePosition = (canvas,evt) => {
@@ -17,6 +13,7 @@ const getMousePosition = (canvas,evt) => {
             y: evt.clientY - rect.top
         };
 }
+//参照渡し防止
 const copyPosition = (pos) => {
     return {
         x:pos.x,
@@ -89,7 +86,7 @@ const mouse_drag = () => {
     d_cameraPos.y = cameraPos.y-prev_cameraPos.y
     prev_cameraPos = copyPosition(cameraPos)
 }
-//マウスドラッグ後の余韻
+//マウスドラッグ後の余韻(勢いよくドラッグすると動作に余韻が出る)
 const mouse_drag_after = () => {
     d_cameraPos.x = Math.abs(d_cameraPos.x)>eps ? d_cameraPos.x*0.9 : 0
     d_cameraPos.y = Math.abs(d_cameraPos.y)>eps ? d_cameraPos.y*0.9 : 0
@@ -121,7 +118,6 @@ const drawPlotAll = () => {
     ctx.strokeStyle = '#16f'
     ctx.fillStyle = '#39f'
     convert.forEach((pos,index)=> {
-        //index == 0 ? ctx.moveTo(pos.x,pos.y) : ctx.lineTo(pos.x,pos.y)
         ctx.beginPath()
         ctx.lineWidth = 5*imageScale
         ctx.arc( pos.x, pos.y, 8*imageScale, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
@@ -129,14 +125,16 @@ const drawPlotAll = () => {
         ctx.stroke()
         ctx.closePath()
     })
-    //ctx.stroke();
 }
 //main文
 const all = () => {
     ini()
+    //マウスがクリックされている時
     if(move_flag) {
+        //マウスドラッグ中の操作
         mouse_drag()
     } else {
+        //マウスを離した時の余韻
         mouse_drag_after()
     }
     cameraPositionFix()

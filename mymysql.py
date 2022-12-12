@@ -71,6 +71,7 @@ class CoordinatesList:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()
             #result = [{"x":ele[0],"y":ele[1]} for ele in rows]
+            #座標リストを取得してるよ
             result = [Point(ele[1],ele[0]) for ele in rows]
             return result
         except Exception as e:
@@ -78,6 +79,7 @@ class CoordinatesList:
             return []
     #座標リスト生成
     def createCoordinatesList(self,table_name:str,coordinatesList):
+        #まず、リレーションシップをテーブル名とした座標リストを作成
         sql="""
             CREATE table {tbname}(
                 id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -88,6 +90,7 @@ class CoordinatesList:
         try:
             self.cursor.execute(sql)
             for elem in coordinatesList:
+                #座標リストの座標を順番にinsert
                 sql="""
                 insert INTO {tbname}(x,y) values({x},{y});
                 """.format(tbname=table_name,x=elem.x,y=elem.y)
@@ -102,6 +105,8 @@ class CoordinatesList:
     def close(self):
         self.cnx.close()
 
+
+#以下、テスト用コード。読まなくて良い
 # if __name__ == "__main__":
 #     coordinatesList = CoordinatesList("kosenmap2022")
 #     print(coordinatesList.isExistCoordinatesList("test"))
