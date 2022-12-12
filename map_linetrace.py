@@ -15,7 +15,6 @@ Point._delta_udlr = (
 def _Point____add__(self, other):
     return Point(self.y + other.y,self.x + other.x)
 
-
 def _Point__udlr(self):
     return [self + delta for delta in self._delta_udlr]
 
@@ -24,6 +23,7 @@ Point.udlr = _Point__udlr
 
 def heuristic_cost(point1:Point,point2:Point) -> float:
     return math.sqrt(pow(point1.x-point2.x,2) + pow(point1.y-point2.y,2))
+
 def is_passable(pixel) -> bool:
     return pixel > 200
 

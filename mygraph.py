@@ -24,5 +24,4 @@ class GraphApp:
         result = tx.run(query,start=start,goal=goal)
         data = result.data()
         graph =result.graph()
-        print(list(graph.nodes))
         return [data[0],graph.relationships,list(graph.nodes)]

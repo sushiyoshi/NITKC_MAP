@@ -8,15 +8,19 @@ import sys
 from mymysql import CoordinatesList,LocationList
 app = Flask(__name__)
 
+#左枠に施設を表示
 def AreaTextConvert(area):
     if area[1] is None:
+        #floorがNULLでなければ
         return area[0]
     else:
+        #floorがNULLなら
         return area[0] + str(area[1]) + "階"
-
+#最初の入力画面
 @app.route("/")
 def index():
     return render_template("index.html")
+#経路表示画面
 @app.route("/mappage", methods=['GET'])
 def mappage():
     #ユーザー入力を受け取る
@@ -24,15 +28,16 @@ def mappage():
     target = request.args.get('loc2', '')
     #Location-Areaテーブルにアクセス
     location_list = LocationList(sys.argv[2])
-    #LocationをAreaに変換
+    #LocationをAreaに変換(無効な場合、Falseを返す)
     currentArea = location_list.getArea(current)
     targetArea = location_list.getArea(target)
     #無効なLocationを取得した際、エラーページを表示
     if not(currentArea and targetArea):
         return render_template("error.html",error_text="location not found")
-    #
+    
     currentAreaText = currentArea[0][0]
     targetAreaText = targetArea[0][0]
+
     currentAreaFloor = AreaTextConvert(currentArea[0])
     targetAreaFloor = AreaTextConvert(targetArea[0])
     #現在地から目的地への最短経路を取得
@@ -48,7 +53,6 @@ def mappage():
     coordinatesList = CoordinatesList(sys.argv[2])
     # 以下クソコ
     for current in relationships:
-        #current = relationships[i]
         re = []
         table_name=current._properties['name']
         #座標リストデータベース上に該当する座標リストが存在したら
@@ -70,6 +74,7 @@ def mappage():
     coordinatesList.close()
     return render_template("mappage.html",path=pathList,currentAreaFloor=currentAreaFloor,targetAreaFloor=targetAreaFloor)
 
+#グラフデータベースにアクセス
 def get_node_path(Area1,Area2):
     uri = "neo4j+s://cfa2fb67.databases.neo4j.io:7687"
     user = "neo4j"

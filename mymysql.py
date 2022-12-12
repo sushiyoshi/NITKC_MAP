@@ -12,16 +12,17 @@ class LocationList:
                 user='root',  # ユーザー名
                 password=pswd,  # パスワード
                 host='localhost',  # ホスト名(IPアドレス）
-                db='locationList'
+                db='locationList' #データベース名
             )
             self.cursor=self.cnx.cursor()
         except Exception as e:
             print(f"Error Occurred: {e}")
     #LocationをAreaに変換
     def getArea(self,location):
+        #MySQLに送信するクエリ(tbを指定してテーブル名を変更)
         sql="""
-        select area,floor from locationList where location = "{nm}";
-        """.format(nm=location)
+        select area,floor from {tb} where location = "{nm}";
+        """.format(nm=location,tb="locationList")
         try:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()
@@ -44,7 +45,7 @@ class CoordinatesList:
                 user='root',  # ユーザー名
                 password=pswd,  # パスワード
                 host='localhost',  # ホスト名(IPアドレス）
-                db='coordinatesList'
+                db='coordinatesList' #データベース名
             )
             self.cursor=self.cnx.cursor()
         except Exception as e:
