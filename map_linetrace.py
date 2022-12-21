@@ -102,7 +102,6 @@ def get_path(img,start_point: Point,goal_point: Point)-> typing.List[Point]:
 
 def draw_path_fromto(input, start_point, goal_point):
     path = get_path(input, start_point, goal_point)
-    # HACK: Implemented roughly.
     delta_square = [Point(y, x)
                     for y in range(3)
                     for x in range(3)]
@@ -126,22 +125,21 @@ def paint_path(input):
     return output
 
 def get_plot(start_point, goal_point):
-    img1 = cv2.imread("map2.png")
+    img1 = cv2.imread("map22.png")
     img1gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     ret,mask=cv2.threshold(img1gray,250,255,cv2.THRESH_BINARY)
     cv2.imwrite("output-3.png", mask)
     path = get_path(mask, start_point, goal_point)
     return path[::5]
 
-
 #テスト用コード。読まなくて良い
 if __name__ == "__main__":
-    img1 = cv2.imread("map2.png")
+    img1 = cv2.imread("map22.png")
     img1gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     ret,mask=cv2.threshold(img1gray,250,255,cv2.THRESH_BINARY)
     cv2.imwrite("output-3.png", mask)
-    start_point = Point(262,593)
-    goal_point = Point(450,484)
+    start_point = Point(230, 519)
+    goal_point = Point(250,545)
     output = draw_path_fromto(mask,start_point,goal_point)
     #output = output[::5]
     output = paint_path(output)

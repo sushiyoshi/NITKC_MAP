@@ -12,7 +12,7 @@ class LocationList:
                 user='root',  # ユーザー名
                 password=pswd,  # パスワード
                 host='localhost',  # ホスト名(IPアドレス）
-                db='locationList' #データベース名
+                db='location_AreaList' #データベース名
             )
             self.cursor=self.cnx.cursor()
         except Exception as e:
@@ -22,14 +22,13 @@ class LocationList:
         #MySQLに送信するクエリ(tbを指定してテーブル名を変更)
         sql="""
         select area,floor from {tb} where location = "{nm}";
-        """.format(nm=location,tb="locationList")
+        """.format(nm=location,tb="relation")
         try:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()
             if len(rows)>0:
                 return rows
             else:
-                print(sql)
                 return False
         except Exception as e:
             print(e)
@@ -53,7 +52,7 @@ class CoordinatesList:
     #座標リストが存在するかを判定
     def isExistCoordinatesList(self,name:str)->Boolean:
         sql="""
-        show tables like '{nm}';
+        show tables like "{nm}";
         """.format(nm=name)
         try:
             self.cursor.execute(sql)
@@ -86,7 +85,7 @@ class CoordinatesList:
                 x float,
                 y float
             );
-            """.format(tbname=table_name)
+            """.format(tbname=table_name.replace('-','_'))
         try:
             self.cursor.execute(sql)
             for elem in coordinatesList:
@@ -97,14 +96,14 @@ class CoordinatesList:
                 try:
                     self.cursor.execute(sql)
                 except Exception as e:
-                    Exception(e)
+                    return Exception(e)
             self.cnx.commit()
+            return True
         except Exception as e:
-            Exception(e)
+            return Exception(e)
 
     def close(self):
         self.cnx.close()
-
 
 #以下、テスト用コード。読まなくて良い
 # if __name__ == "__main__":

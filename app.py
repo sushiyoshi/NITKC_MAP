@@ -7,12 +7,15 @@ from flask import request
 import sys
 from mymysql import CoordinatesList,LocationList
 app = Flask(__name__)
+import math
 
 #左枠に施設を表示
 def AreaTextConvert(area):
     if area[1] is None:
         #floorがNULLでなければ
         return area[0]
+    elif area[0] == "総合教育棟not1F":
+        return "総合教育棟" + str(area[1]) + "階"
     else:
         #floorがNULLなら
         return area[0] + str(area[1]) + "階"
@@ -42,10 +45,11 @@ def mappage():
     targetAreaFloor = AreaTextConvert(targetArea[0])
     #現在地から目的地への最短経路を取得
     result = get_node_path(currentAreaText,targetAreaText)
-    #距離を取得
-    weight = result[0]['weight']
-    #経由するノードを取得
-    path = result[0]['path'][::2]
+    # #距離を取得
+    # weight = result[0]['weight']
+    # #経由するノードを取得
+    # path = result[0]['path'][::2]
+    # print(path)
     #経路を形成する点の座標リストを格納
     pathList = []
     relationships = result[1]
@@ -54,14 +58,14 @@ def mappage():
     # 以下クソコ
     for current in relationships:
         re = []
-        table_name=current._properties['name']
+        table_name=current._properties['name'].replace('-','_')
         #座標リストデータベース上に該当する座標リストが存在したら(→mymysql.py)
         if coordinatesList.isExistCoordinatesList(table_name):
             print("Get a coordinates list")
             re = coordinatesList.getCoordinatesList(table_name)
         else:
         #存在しなかったら、新たに座標リストを作成
-            print("Create a new coordinates list")
+            print("Create a new coordinates list",current.nodes)
             pointList =[]
             for node in current.nodes:
                 #ここが一番やばい部分なので、解読しなくて良いです。
@@ -72,11 +76,12 @@ def mappage():
                 #ノードが複数の座標を持っていた場合、どの座標を採用するかを設定するインデックス(通常は存在しない)
                 index = "index_{}".format(node.id)
                 j = current._properties[index] if index in current._properties else 0
-                pointList.append(Point(node._properties['y'][j],node._properties['x'][j]))
+                pointList.append(Point(math.floor(node._properties['y'][j]),math.floor(node._properties['x'][j])))
             #グラフデータベースから読み込んだ二つの座標を結ぶ経路の座標リストをOpenCVで生成(→map_linetrace.py)
+            print("aaaaaaaa",pointList[0],pointList[1])
             re = get_plot(pointList[0],pointList[1])
             #生成した座標リストをMySQLに登録(→mymysql.py)
-            coordinatesList.createCoordinatesList(table_name,re)
+            print(coordinatesList.createCoordinatesList(table_name,re))
         #座標リストにリレーションシップを形成する点の座標を登録
         pathList.extend(re)
     coordinatesList.close()
@@ -84,11 +89,10 @@ def mappage():
 
 #グラフデータベースにアクセス
 def get_node_path(Area1,Area2):
-    uri = "neo4j+s://cfa2fb67.databases.neo4j.io:7687"
+    uri = "neo4j+s://8572c621.databases.neo4j.io:7687"
     user = "neo4j"
     password = sys.argv[1]
     graphapp = GraphApp(uri, user, password)
-
     result = graphapp.find_shortestPath(Area1,Area2)
     graphapp.close()
     return result
