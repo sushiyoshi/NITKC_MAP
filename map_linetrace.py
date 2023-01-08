@@ -139,7 +139,7 @@ if __name__ == "__main__":
     ret,mask=cv2.threshold(img1gray,250,255,cv2.THRESH_BINARY)
     cv2.imwrite("output-3.png", mask)
     start_point = Point(230, 519)
-    goal_point = Point(250,545)
+    goal_point = Point(250,541)
     output = draw_path_fromto(mask,start_point,goal_point)
     #output = output[::5]
     output = paint_path(output)
